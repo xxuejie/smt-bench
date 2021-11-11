@@ -2,7 +2,7 @@ mod old;
 mod trie;
 mod utils;
 
-extern crate cpuprofiler;
+// extern crate cpuprofiler;
 
 use crate::{old::CountingStore, trie::TrieStore};
 use gw_store::Store as GwStore;
@@ -22,8 +22,8 @@ type SMT<'a, DB> = SparseMerkleTree<Blake2bHasher, H256, CountingStore<'a, DB>>;
 type SMT2<'a, DB> = SparseMerkleTree<Blake2bHasher, H256, TrieStore<'a, DB>>;
 
 fn main() {
-    use cpuprofiler::PROFILER;
-    PROFILER.lock().unwrap().start("./my-prof.profile").unwrap();
+    // use cpuprofiler::PROFILER;
+    // PROFILER.lock().unwrap().start("./my-prof.profile").unwrap();
 
     let mut rng = ChaCha20Rng::seed_from_u64(0);
 
