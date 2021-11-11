@@ -5,12 +5,15 @@ mod utils;
 // extern crate cpuprofiler;
 
 use crate::{old::CountingStore, trie::TrieStore};
+use gw_config::StoreConfig;
+use gw_db::RocksDB;
 use gw_store::Store as GwStore;
 use rand_chacha::{
     rand_core::{RngCore, SeedableRng},
     ChaCha20Rng,
 };
 use sparse_merkle_tree::{blake2b::Blake2bHasher, SparseMerkleTree, H256};
+use std::path::PathBuf;
 
 fn random_h256(rng: &mut impl RngCore) -> H256 {
     let mut buf = [0u8; 32];
@@ -28,7 +31,9 @@ fn main() {
     let mut rng = ChaCha20Rng::seed_from_u64(0);
 
     // let store = GwStore::open_tmp().unwrap();
-    let store2 = GwStore::open_tmp().unwrap();
+    let config2 = StoreConfig{path: PathBuf::from("./store2.db".to_string()), ..Default::default()};
+    let db2 = RocksDB::open(&config2, 10);
+    let store2 = GwStore::new(db2);
 
     // Initializing
     let root = {
@@ -57,7 +62,7 @@ fn main() {
 
     // Testing
     let mut pairs = vec![];
-    for _ in 0..10 {
+    for _ in 0..10000 {
         let key = random_h256(&mut rng);
         let value = random_h256(&mut rng);
         pairs.push((key, value));

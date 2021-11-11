@@ -12,6 +12,7 @@ rand = "0.7"
 rand_chacha = "0.3.1"
 gw-db = { git = "https://github.com/nervosnetwork/godwoken" }
 gw-common = { git = "https://github.com/nervosnetwork/godwoken" }
+gw-config = { git = "https://github.com/nervosnetwork/godwoken" }
 gw-store = { git = "https://github.com/nervosnetwork/godwoken" }
 gw-types = { git = "https://github.com/nervosnetwork/godwoken" }
 # cpuprofiler = "0.0.4"
