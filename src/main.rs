@@ -63,7 +63,10 @@ fn main() {
         let tx = store.begin_transaction();
         let store = CountingStore::new(&tx);
         let mut smt = SMT::new(root, store);
-        smt.update_all(pairs).unwrap();
+        // smt.update_all(pairs).unwrap();
+        for (k, v) in pairs {
+            smt.update(k, v).unwrap();
+        }
         tx.commit().unwrap();
         println!(
             "Round #{}, elapsed time: {:?}, stats: {}",

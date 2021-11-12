@@ -38,14 +38,12 @@ impl<'a, DB: KVStore> CountingStore<'a, DB> {
 }
 
 // Simulating Pack/Unpack trait impls
-fn pack_key(key: &BranchKey) -> packed::SMTBranchKey {
-    let height = key.height.into();
-    let node_key: [u8; 32] = key.node_key.into();
-
-    packed::SMTBranchKey::new_builder()
-        .height(height)
-        .node_key(node_key.pack())
-        .build()
+fn pack_key(key: &BranchKey) -> Vec<u8> {
+    let mut data = vec![0u8; 33];
+    data[0] = key.height;
+    data[1..33].copy_from_slice(key.node_key.as_slice());
+    data.reverse();
+    data
 }
 
 fn unpack_h256(value: &packed::Byte32Reader) -> H256 {
@@ -117,8 +115,8 @@ fn unpack_branch(branch: &packed::SMTBranchNodeReader) -> BranchNode {
 impl<'a, DB: KVStore> Store<H256> for CountingStore<'a, DB> {
     fn get_branch(&self, branch_key: &BranchKey) -> Result<Option<BranchNode>, SMTError> {
         self.reads.set(self.reads.get() + 1);
-        let branch_key: packed::SMTBranchKey = pack_key(branch_key);
-        match self.store.get(0, branch_key.as_slice()) {
+        let key = pack_key(branch_key);
+        match self.store.get(0, &key) {
             Some(slice) => {
                 let branch = packed::SMTBranchNodeReader::from_slice_should_be_ok(slice.as_ref());
                 Ok(Some(unpack_branch(&branch)))
@@ -141,12 +139,11 @@ impl<'a, DB: KVStore> Store<H256> for CountingStore<'a, DB> {
     }
 
     fn insert_branch(&mut self, branch_key: BranchKey, branch: BranchNode) -> Result<(), SMTError> {
-        let branch_key: packed::SMTBranchKey = pack_key(&branch_key);
         let branch: packed::SMTBranchNode = pack_branch(&branch);
 
         self.writes += 1;
         self.store
-            .insert_raw(0, branch_key.as_slice(), branch.as_slice())
+            .insert_raw(0, &pack_key(&branch_key), branch.as_slice())
             .map_err(|err| SMTError::Store(format!("insert error {}", err)))?;
 
         Ok(())
@@ -162,11 +159,9 @@ impl<'a, DB: KVStore> Store<H256> for CountingStore<'a, DB> {
     }
 
     fn remove_branch(&mut self, branch_key: &BranchKey) -> Result<(), SMTError> {
-        let branch_key: packed::SMTBranchKey = pack_key(branch_key);
-
         self.writes += 1;
         self.store
-            .delete(0, branch_key.as_slice())
+            .delete(0, &pack_key(branch_key))
             .map_err(|err| SMTError::Store(format!("delete error {}", err)))?;
 
         Ok(())
