@@ -1,4 +1,5 @@
 /target
-my-prof*
+*.profile
+*.svg
 perf.data
 store.db/
