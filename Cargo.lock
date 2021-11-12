@@ -775,6 +775,7 @@ dependencies = [
  "blake2b-rs",
  "cpuprofiler",
  "gw-common",
+ "gw-config",
  "gw-db",
  "gw-store",
  "gw-types",

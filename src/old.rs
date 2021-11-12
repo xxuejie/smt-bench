@@ -27,13 +27,13 @@ impl<'a, DB: KVStore> CountingStore<'a, DB> {
         }
     }
 
-    pub fn clear_stats(&mut self) {
-        self.reads.set(0);
-        self.writes = 0;
-    }
+    // pub fn clear_stats(&mut self) {
+    // self.reads.set(0);
+    // self.writes = 0;
+    // }
 
-    pub fn stats(&self) {
-        println!("Reads: {}, writes: {}", self.reads.get(), self.writes);
+    pub fn stats(&self) -> String {
+        format!("Reads: {}, writes: {}", self.reads.get(), self.writes)
     }
 }
 
